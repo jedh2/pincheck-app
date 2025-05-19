@@ -59,7 +59,7 @@ jobs:
               sudo chmod +x /usr/local/bin/docker-compose
             fi
 
-            cd ~/pincheck
+            cd ~/pincheck-app
 
             echo "Starting app with AWS credentials in environment..."
 
