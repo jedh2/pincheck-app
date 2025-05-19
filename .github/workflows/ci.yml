@@ -26,7 +26,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "."
-          target: "~/pincheck"
+          target: "~/pincheck-app"
 
       - name: SSH into EC2 and deploy
         uses: appleboy/ssh-action@v0.1.6
@@ -59,7 +59,7 @@ jobs:
               sudo chmod +x /usr/local/bin/docker-compose
             fi
 
-            cd ~/pincheck
+            cd ~/pincheck-app
 
             echo "Starting app with AWS credentials in environment..."
 
