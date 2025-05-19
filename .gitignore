@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.log
+*.sqlite3
+
+# Environment
+.env
+.env.*
+
+# Virtual environment
+.venv/
+env/
+venv/
+
+# Model files
+*.pth
+*.pt
+app/model/*.pth
+app/model/*.pt
+
+# Logs
+logs/
+*.log
+
+# Flask cache and uploads
+instance/
+*.db
+*.sqlite
+uploads/
+
+# VSCode
+.vscode/
+
+# macOS system files
+.DS_Store
+
+# Docker
+*.pid
+*.sock
+docker-compose.override.yml
+
+# PyTorch cache (optional)
+~/.cache/torch/
+
+# AWS
+*.pem
