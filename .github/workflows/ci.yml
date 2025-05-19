@@ -45,7 +45,7 @@ jobs:
               sudo apt install -y ca-certificates curl gnupg
               sudo install -m 0755 -d /etc/apt/keyrings
               curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-              echo                 "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu                 $(. /etc/os-release && echo $VERSION_CODENAME) stable" |                 sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+              echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
               sudo apt update
               sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
             fi
@@ -59,10 +59,9 @@ jobs:
               sudo chmod +x /usr/local/bin/docker-compose
             fi
 
-            cd ~/pincheck-app
+            cd ~/pincheck
 
             echo "Starting app with AWS credentials in environment..."
 
-            AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID             AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY             AWS_REGION=$AWS_REGION             sudo docker-compose -f docker-compose.prod.yml down
-
-            AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID             AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY             AWS_REGION=$AWS_REGION             sudo docker-compose -f docker-compose.prod.yml up --build -d
+            sudo docker-compose -f docker-compose.prod.yml down
+            sudo docker-compose -f docker-compose.prod.yml up --build -d
