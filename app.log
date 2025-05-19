@@ -1,0 +1,208 @@
+2025-05-16 20:26:36,213 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.18.0.2:5000
+2025-05-16 20:26:36,213 - INFO - [33mPress CTRL+C to quit[0m
+2025-05-16 20:26:36,214 - INFO -  * Restarting with stat
+2025-05-16 20:26:36,946 - WARNING -  * Debugger is active!
+2025-05-16 20:26:36,946 - INFO -  * Debugger PIN: 324-819-627
+2025-05-16 20:27:21,135 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.18.0.2:5000
+2025-05-16 20:27:21,135 - INFO - [33mPress CTRL+C to quit[0m
+2025-05-16 20:27:21,136 - INFO -  * Restarting with stat
+2025-05-16 20:27:21,876 - WARNING -  * Debugger is active!
+2025-05-16 20:27:21,876 - INFO -  * Debugger PIN: 377-986-781
+2025-05-16 20:27:47,632 - INFO - 📥 GET / accessed
+2025-05-16 20:27:47,637 - INFO - 192.168.65.1 - - [16/May/2025 20:27:47] "GET / HTTP/1.1" 200 -
+2025-05-16 20:27:47,685 - INFO - 192.168.65.1 - - [16/May/2025 20:27:47] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-05-16 20:28:55,928 - ERROR - 🔥 Exception in /predict route:
+2025-05-16 20:28:55,929 - ERROR - Traceback (most recent call last):
+  File "/app/run.py", line 24, in predict
+    label, gradcam_url = predict_image(front_file, side="front")
+  File "/app/app/inference.py", line 41, in predict_image
+    model = load_model(side)
+  File "/app/app/inference.py", line 33, in load_model
+    download_model_if_needed(side)
+  File "/app/app/inference.py", line 30, in download_model_if_needed
+    s3.download_file(s3_bucket, s3_keys[side], local_path)
+  File "/usr/local/lib/python3.10/site-packages/botocore/context.py", line 123, in wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/boto3/s3/inject.py", line 223, in download_file
+    return transfer.download_file(
+  File "/usr/local/lib/python3.10/site-packages/boto3/s3/transfer.py", line 406, in download_file
+    future.result()
+  File "/usr/local/lib/python3.10/site-packages/s3transfer/futures.py", line 111, in result
+    return self._coordinator.result()
+  File "/usr/local/lib/python3.10/site-packages/s3transfer/futures.py", line 272, in result
+    raise self._exception
+  File "/usr/local/lib/python3.10/site-packages/s3transfer/tasks.py", line 272, in _main
+    self._submit(transfer_future=transfer_future, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/s3transfer/download.py", line 352, in _submit
+    response = client.head_object(
+  File "/usr/local/lib/python3.10/site-packages/botocore/client.py", line 595, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+  File "/usr/local/lib/python3.10/site-packages/botocore/context.py", line 123, in wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/botocore/client.py", line 1040, in _make_api_call
+    http, parsed_response = self._make_request(
+  File "/usr/local/lib/python3.10/site-packages/botocore/client.py", line 1064, in _make_request
+    return self._endpoint.make_request(operation_model, request_dict)
+  File "/usr/local/lib/python3.10/site-packages/botocore/endpoint.py", line 119, in make_request
+    return self._send_request(request_dict, operation_model)
+  File "/usr/local/lib/python3.10/site-packages/botocore/endpoint.py", line 196, in _send_request
+    request = self.create_request(request_dict, operation_model)
+  File "/usr/local/lib/python3.10/site-packages/botocore/endpoint.py", line 132, in create_request
+    self._event_emitter.emit(
+  File "/usr/local/lib/python3.10/site-packages/botocore/hooks.py", line 412, in emit
+    return self._emitter.emit(aliased_event_name, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/botocore/hooks.py", line 256, in emit
+    return self._emit(event_name, kwargs)
+  File "/usr/local/lib/python3.10/site-packages/botocore/hooks.py", line 239, in _emit
+    response = handler(**kwargs)
+  File "/usr/local/lib/python3.10/site-packages/botocore/signers.py", line 106, in handler
+    return self.sign(operation_name, request)
+  File "/usr/local/lib/python3.10/site-packages/botocore/signers.py", line 198, in sign
+    auth.add_auth(request)
+  File "/usr/local/lib/python3.10/site-packages/botocore/auth.py", line 424, in add_auth
+    raise NoCredentialsError()
+botocore.exceptions.NoCredentialsError: Unable to locate credentials
+
+2025-05-16 20:28:55,930 - INFO - 192.168.65.1 - - [16/May/2025 20:28:55] "[35m[1mPOST /predict HTTP/1.1[0m" 500 -
+2025-05-16 20:31:12,177 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.18.0.2:5000
+2025-05-16 20:31:12,177 - INFO - [33mPress CTRL+C to quit[0m
+2025-05-16 20:31:12,177 - INFO -  * Restarting with stat
+2025-05-16 20:31:12,861 - WARNING -  * Debugger is active!
+2025-05-16 20:31:12,861 - INFO -  * Debugger PIN: 554-623-384
+2025-05-16 20:31:30,206 - INFO - 📥 GET / accessed
+2025-05-16 20:31:30,210 - INFO - 192.168.65.1 - - [16/May/2025 20:31:30] "GET / HTTP/1.1" 200 -
+2025-05-16 20:31:40,427 - ERROR - 🔥 Exception in /predict route:
+2025-05-16 20:31:40,428 - ERROR - Traceback (most recent call last):
+  File "/app/run.py", line 24, in predict
+    label, gradcam_url = predict_image(front_file, side="front")
+  File "/app/app/inference.py", line 41, in predict_image
+    model = load_model(side)
+  File "/app/app/inference.py", line 33, in load_model
+    download_model_if_needed(side)
+  File "/app/app/inference.py", line 30, in download_model_if_needed
+    s3.download_file(s3_bucket, s3_keys[side], local_path)
+  File "/usr/local/lib/python3.10/site-packages/botocore/context.py", line 123, in wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/boto3/s3/inject.py", line 223, in download_file
+    return transfer.download_file(
+  File "/usr/local/lib/python3.10/site-packages/boto3/s3/transfer.py", line 406, in download_file
+    future.result()
+  File "/usr/local/lib/python3.10/site-packages/s3transfer/futures.py", line 111, in result
+    return self._coordinator.result()
+  File "/usr/local/lib/python3.10/site-packages/s3transfer/futures.py", line 272, in result
+    raise self._exception
+  File "/usr/local/lib/python3.10/site-packages/s3transfer/tasks.py", line 272, in _main
+    self._submit(transfer_future=transfer_future, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/s3transfer/download.py", line 352, in _submit
+    response = client.head_object(
+  File "/usr/local/lib/python3.10/site-packages/botocore/client.py", line 595, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+  File "/usr/local/lib/python3.10/site-packages/botocore/context.py", line 123, in wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/botocore/client.py", line 1040, in _make_api_call
+    http, parsed_response = self._make_request(
+  File "/usr/local/lib/python3.10/site-packages/botocore/client.py", line 1064, in _make_request
+    return self._endpoint.make_request(operation_model, request_dict)
+  File "/usr/local/lib/python3.10/site-packages/botocore/endpoint.py", line 119, in make_request
+    return self._send_request(request_dict, operation_model)
+  File "/usr/local/lib/python3.10/site-packages/botocore/endpoint.py", line 196, in _send_request
+    request = self.create_request(request_dict, operation_model)
+  File "/usr/local/lib/python3.10/site-packages/botocore/endpoint.py", line 132, in create_request
+    self._event_emitter.emit(
+  File "/usr/local/lib/python3.10/site-packages/botocore/hooks.py", line 412, in emit
+    return self._emitter.emit(aliased_event_name, **kwargs)
+  File "/usr/local/lib/python3.10/site-packages/botocore/hooks.py", line 256, in emit
+    return self._emit(event_name, kwargs)
+  File "/usr/local/lib/python3.10/site-packages/botocore/hooks.py", line 239, in _emit
+    response = handler(**kwargs)
+  File "/usr/local/lib/python3.10/site-packages/botocore/signers.py", line 106, in handler
+    return self.sign(operation_name, request)
+  File "/usr/local/lib/python3.10/site-packages/botocore/signers.py", line 198, in sign
+    auth.add_auth(request)
+  File "/usr/local/lib/python3.10/site-packages/botocore/auth.py", line 424, in add_auth
+    raise NoCredentialsError()
+botocore.exceptions.NoCredentialsError: Unable to locate credentials
+
+2025-05-16 20:31:40,429 - INFO - 192.168.65.1 - - [16/May/2025 20:31:40] "[35m[1mPOST /predict HTTP/1.1[0m" 500 -
+2025-05-16 20:36:22,047 - INFO -  * Detected change in '/app/run.py', reloading
+2025-05-16 20:36:22,251 - INFO -  * Restarting with stat
+2025-05-16 20:36:22,925 - WARNING -  * Debugger is active!
+2025-05-16 20:36:22,925 - INFO -  * Debugger PIN: 554-623-384
+2025-05-16 20:36:31,170 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.18.0.2:5000
+2025-05-16 20:36:31,170 - INFO - [33mPress CTRL+C to quit[0m
+2025-05-16 20:36:31,170 - INFO -  * Restarting with stat
+2025-05-16 20:36:31,821 - WARNING -  * Debugger is active!
+2025-05-16 20:36:31,822 - INFO -  * Debugger PIN: 120-511-557
+2025-05-16 20:36:34,527 - INFO - 📥 GET / accessed
+2025-05-16 20:36:34,529 - INFO - 192.168.65.1 - - [16/May/2025 20:36:34] "GET / HTTP/1.1" 200 -
+2025-05-16 20:36:41,827 - INFO - Found credentials in environment variables.
+2025-05-16 20:37:09,370 - INFO - 192.168.65.1 - - [16/May/2025 20:37:09] "POST /predict HTTP/1.1" 200 -
+2025-05-16 20:37:09,384 - INFO - 192.168.65.1 - - [16/May/2025 20:37:09] "[33mGET /app/static/gradcam_results/back_gradcam.jpg HTTP/1.1[0m" 404 -
+2025-05-16 20:37:09,384 - INFO - 192.168.65.1 - - [16/May/2025 20:37:09] "[33mGET /app/static/gradcam_results/front_gradcam.jpg HTTP/1.1[0m" 404 -
+2025-05-16 20:41:36,268 - INFO -  * Detected change in '/app/app/gradcam.py', reloading
+2025-05-16 20:41:36,519 - INFO -  * Restarting with stat
+2025-05-16 20:41:37,282 - WARNING -  * Debugger is active!
+2025-05-16 20:41:37,283 - INFO -  * Debugger PIN: 120-511-557
+2025-05-16 20:41:47,489 - INFO -  * Detected change in '/app/app/gradcam.py', reloading
+2025-05-16 20:41:47,684 - INFO -  * Restarting with stat
+2025-05-16 20:41:48,350 - WARNING -  * Debugger is active!
+2025-05-16 20:41:48,350 - INFO -  * Debugger PIN: 120-511-557
+2025-05-16 20:41:56,652 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.18.0.2:5000
+2025-05-16 20:41:56,652 - INFO - [33mPress CTRL+C to quit[0m
+2025-05-16 20:41:56,653 - INFO -  * Restarting with stat
+2025-05-16 20:41:57,364 - WARNING -  * Debugger is active!
+2025-05-16 20:41:57,364 - INFO -  * Debugger PIN: 335-840-429
+2025-05-16 20:42:01,528 - INFO - 📥 GET / accessed
+2025-05-16 20:42:01,531 - INFO - 192.168.65.1 - - [16/May/2025 20:42:01] "GET / HTTP/1.1" 200 -
+2025-05-16 20:42:11,141 - INFO - 192.168.65.1 - - [16/May/2025 20:42:11] "POST /predict HTTP/1.1" 200 -
+2025-05-16 20:42:11,148 - INFO - 192.168.65.1 - - [16/May/2025 20:42:11] "[33mGET /static/gradcam_results/front_gradcam.jpg HTTP/1.1[0m" 404 -
+2025-05-16 20:42:11,149 - INFO - 192.168.65.1 - - [16/May/2025 20:42:11] "[33mGET /static/gradcam_results/back_gradcam.jpg HTTP/1.1[0m" 404 -
+2025-05-16 20:42:28,960 - INFO - 192.168.65.1 - - [16/May/2025 20:42:28] "POST /predict HTTP/1.1" 200 -
+2025-05-16 20:42:28,973 - INFO - 192.168.65.1 - - [16/May/2025 20:42:28] "GET /static/gradcam_results/back_gradcam.jpg HTTP/1.1" 200 -
+2025-05-16 20:42:28,973 - INFO - 192.168.65.1 - - [16/May/2025 20:42:28] "GET /static/gradcam_results/front_gradcam.jpg HTTP/1.1" 200 -
+2025-05-16 21:03:21,613 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.18.0.2:5000
+2025-05-16 21:03:21,613 - INFO - [33mPress CTRL+C to quit[0m
+2025-05-16 21:03:21,613 - INFO -  * Restarting with stat
+2025-05-16 21:03:22,327 - WARNING -  * Debugger is active!
+2025-05-16 21:03:22,328 - INFO -  * Debugger PIN: 518-764-563
+2025-05-16 21:03:24,107 - INFO - 📥 GET / accessed
+2025-05-16 21:03:24,111 - INFO - 192.168.65.1 - - [16/May/2025 21:03:24] "GET / HTTP/1.1" 200 -
+2025-05-16 21:03:32,392 - INFO - Found credentials in environment variables.
+2025-05-16 21:03:47,549 - INFO - 192.168.65.1 - - [16/May/2025 21:03:47] "POST /predict HTTP/1.1" 200 -
+2025-05-16 21:03:47,574 - INFO - 192.168.65.1 - - [16/May/2025 21:03:47] "GET /static/gradcam_results/front_gradcam.jpg HTTP/1.1" 200 -
+2025-05-16 21:03:47,575 - INFO - 192.168.65.1 - - [16/May/2025 21:03:47] "GET /static/gradcam_results/back_gradcam.jpg HTTP/1.1" 200 -
+2025-05-16 21:04:38,760 - INFO -  * Detected change in '/app/app/inference.py', reloading
+2025-05-16 21:04:38,990 - INFO -  * Restarting with stat
+2025-05-16 21:04:39,730 - WARNING -  * Debugger is active!
+2025-05-16 21:04:39,731 - INFO -  * Debugger PIN: 518-764-563
+2025-05-16 21:05:37,249 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.18.0.2:5000
+2025-05-16 21:05:37,250 - INFO - [33mPress CTRL+C to quit[0m
+2025-05-16 21:05:37,250 - INFO -  * Restarting with stat
+2025-05-16 21:05:37,908 - WARNING -  * Debugger is active!
+2025-05-16 21:05:37,908 - INFO -  * Debugger PIN: 792-039-148
+2025-05-16 21:05:41,355 - INFO - 📥 GET / accessed
+2025-05-16 21:05:41,359 - INFO - 192.168.65.1 - - [16/May/2025 21:05:41] "GET / HTTP/1.1" 200 -
+2025-05-16 21:05:55,050 - INFO - 192.168.65.1 - - [16/May/2025 21:05:55] "POST /predict HTTP/1.1" 200 -
+2025-05-16 21:05:55,066 - INFO - 192.168.65.1 - - [16/May/2025 21:05:55] "GET /static/gradcam_results/front_gradcam.jpg HTTP/1.1" 200 -
+2025-05-16 21:05:55,066 - INFO - 192.168.65.1 - - [16/May/2025 21:05:55] "GET /static/gradcam_results/back_gradcam.jpg HTTP/1.1" 200 -

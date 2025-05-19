@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PinCheck Upload</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2em;
+      background-color: #f4f4f4;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 1em;
+    }
+
+    .drop-zone {
+      border: 2px dashed #999;
+      border-radius: 8px;
+      padding: 2em;
+      margin-bottom: 1em;
+      background-color: #fff;
+      cursor: pointer;
+    }
+
+    .drop-zone.dragover {
+      background-color: #eef;
+      border-color: #666;
+    }
+
+    .file-label {
+      font-weight: bold;
+    }
+
+    button {
+      padding: 0.8em 2em;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .preview {
+      margin-top: 2em;
+    }
+
+    .preview img {
+      max-width: 90%;
+      height: auto;
+      margin-top: 1em;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Upload Disney Pin (Front & Back)</h1>
+
+  <form id="uploadForm" enctype="multipart/form-data">
+    <div class="drop-zone" id="drop-zone-front">
+      <span class="file-label">Drag & Drop Front Image Here</span><br>
+      <input type="file" name="front" id="front-input" accept="image/*" hidden>
+    </div>
+
+    <div class="drop-zone" id="drop-zone-back">
+      <span class="file-label">Drag & Drop Back Image Here</span><br>
+      <input type="file" name="back" id="back-input" accept="image/*" hidden>
+    </div>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <div class="preview" id="results"></div>
+
+  <script>
+    const dropZoneFront = document.getElementById('drop-zone-front');
+    const frontInput = document.getElementById('front-input');
+    const dropZoneBack = document.getElementById('drop-zone-back');
+    const backInput = document.getElementById('back-input');
+    const form = document.getElementById('uploadForm');
+    const results = document.getElementById('results');
+
+    function setupDropZone(dropZone, fileInput) {
+      dropZone.addEventListener('click', () => fileInput.click());
+
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+      });
+
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file) {
+          fileInput.files = e.dataTransfer.files;
+          dropZone.querySelector('.file-label').textContent = `Selected: ${file.name}`;
+        }
+      });
+
+      fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        if (file) {
+          dropZone.querySelector('.file-label').textContent = `Selected: ${file.name}`;
+        }
+      });
+    }
+
+    setupDropZone(dropZoneFront, frontInput);
+    setupDropZone(dropZoneBack, backInput);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData();
+      if (frontInput.files.length > 0) {
+        formData.append('front', frontInput.files[0]);
+      }
+      if (backInput.files.length > 0) {
+        formData.append('back', backInput.files[0]);
+      }
+
+      const response = await fetch('/predict', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+      results.innerHTML = `
+        ${data.front_prediction ? `<p><strong>Front Prediction:</strong> ${data.front_prediction}</p><img src="${data.front_gradcam}" alt="Front Grad-CAM">` : ''}
+        ${data.back_prediction ? `<p><strong>Back Prediction:</strong> ${data.back_prediction}</p><img src="${data.back_gradcam}" alt="Back Grad-CAM">` : ''}
+        ${data.error ? `<p style="color:red;">${data.error}</p>` : ''}
+      `;
+    });
+  </script>
+
+</body>
+</html>

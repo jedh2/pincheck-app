@@ -1,0 +1,62 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Copy project files to EC2
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "."
+          target: "~/pincheck"
+
+      - name: SSH into EC2 and deploy
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            export AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}"
+            export AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+            export AWS_REGION="${{ secrets.AWS_REGION }}"
+
+            if ! command -v docker &> /dev/null; then
+              echo "Installing Docker..."
+              sudo apt update
+              sudo apt install -y ca-certificates curl gnupg
+              sudo install -m 0755 -d /etc/apt/keyrings
+              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+              echo                 "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu                 $(. /etc/os-release && echo $VERSION_CODENAME) stable" |                 sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+              sudo apt update
+              sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+            fi
+
+            sudo systemctl start docker
+            sudo systemctl enable docker
+
+            if ! command -v docker-compose &> /dev/null; then
+              echo "Installing Docker Compose..."
+              sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+            fi
+
+            cd ~/pincheck
+
+            echo "Starting app with AWS credentials in environment..."
+
+            AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID             AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY             AWS_REGION=$AWS_REGION             sudo docker-compose -f docker-compose.prod.yml down
+
+            AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID             AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY             AWS_REGION=$AWS_REGION             sudo docker-compose -f docker-compose.prod.yml up --build -d
