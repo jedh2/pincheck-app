@@ -73,7 +73,7 @@ def load_model(side):
     print(f"🚀 Loading model for {side}...")
     download_model_if_needed(side)
     print(f"📥 Loading state dict from {model_paths[side]}")
-    model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=False)
+    model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet34', pretrained=False)
     model.fc = torch.nn.Linear(model.fc.in_features, 2)
     model.load_state_dict(torch.load(model_paths[side], map_location='cpu'))
     model.eval()
