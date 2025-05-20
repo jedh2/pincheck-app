@@ -33,6 +33,7 @@ USE_S3 = True  # Set to False to force fallback to public HTTP
 
 def download_model_if_needed(side):
     local_path = model_paths[side]
+    print(f"🔍 Checking if model for '{side}' exists at: {local_path}")
     if os.path.exists(local_path):
         print(f"✅ Model for {side} already exists.")
         return
@@ -45,14 +46,20 @@ def download_model_if_needed(side):
             print(f"🔐 Trying S3 download for {side}...")
             s3 = boto3.client('s3')
             s3.download_file(s3_bucket, s3_keys[side], local_path)
-            print(f"✅ Downloaded {side} model from S3.")
+            if os.path.exists(local_path):
+                print(f"✅ Downloaded {side} model from S3 to {local_path}.")
+            else:
+                print(f"❌ S3 download claimed success but file does not exist at {local_path}.")
         else:
             raise NoCredentialsError()
     except NoCredentialsError:
         try:
             print(f"🌐 Falling back to public URL for {side}...")
             urllib.request.urlretrieve(S3_URLS[side], local_path)
-            print(f"✅ Downloaded {side} model from public S3 URL.")
+            if os.path.exists(local_path):
+                print(f"✅ Downloaded {side} model from public S3 URL.")
+            else:
+                print(f"❌ Public download claimed success but file not found at {local_path}.")
         except Exception as e:
             print(f"❌ Public URL fallback failed for {side}: {e}")
             traceback.print_exc()
@@ -63,14 +70,18 @@ def download_model_if_needed(side):
         raise
 
 def load_model(side):
+    print(f"🚀 Loading model for {side}...")
     download_model_if_needed(side)
+    print(f"📥 Loading state dict from {model_paths[side]}")
     model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=False)
     model.fc = torch.nn.Linear(model.fc.in_features, 2)
     model.load_state_dict(torch.load(model_paths[side], map_location='cpu'))
     model.eval()
+    print(f"✅ Model for {side} is ready.")
     return model
 
 def predict_image(file, side):
+    print(f"🖼️ Running prediction for {side} image...")
     model = load_model(side)
     image = Image.open(file).convert('RGB')
     transform = transforms.Compose([
@@ -83,6 +94,7 @@ def predict_image(file, side):
     output = model(input_tensor)
     pred = torch.argmax(output, dim=1).item()
     label = 'real' if pred == 1 else 'fake'
+    print(f"🔎 Prediction for {side}: {label}")
 
     gradcam_path = generate_gradcam(model, input_tensor, side)
     return label, gradcam_path
