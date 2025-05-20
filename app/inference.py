@@ -1,3 +1,4 @@
+
 import os
 import torch
 import boto3
@@ -6,6 +7,7 @@ from torchvision import transforms
 from PIL import Image
 from app.gradcam import generate_gradcam
 import urllib.request
+import traceback
 
 # Public S3 HTTP fallback URLs
 S3_URLS = {
@@ -13,7 +15,7 @@ S3_URLS = {
     'back': 'https://pincheck-models.s3.us-east-2.amazonaws.com/model_back.pth'
 }
 
-# Where model will be stores inside the container/app
+# Where model will be stored inside the container/app
 model_paths = {
     'front': 'app/model/model_front.pth',
     'back': 'app/model/model_back.pth'
@@ -26,27 +28,39 @@ s3_keys = {
     'back': 'model_back.pth'
 }
 
+# Control download strategy
+USE_S3 = True  # Set to False to force fallback to public HTTP
+
 def download_model_if_needed(side):
     local_path = model_paths[side]
     if os.path.exists(local_path):
+        print(f"✅ Model for {side} already exists.")
         return
 
     os.makedirs(os.path.dirname(local_path), exist_ok=True)
-    print(f"📦 Downloading {side} model...")
+    print(f"📦 Attempting to download {side} model...")
 
     try:
-        # Try S3 (if credentials are configured)
-        s3 = boto3.client('s3')
-        s3.download_file(s3_bucket, s3_keys[side], local_path)
-        print(f"✅ Downloaded {side} model from S3.")
+        if USE_S3:
+            print(f"🔐 Trying S3 download for {side}...")
+            s3 = boto3.client('s3')
+            s3.download_file(s3_bucket, s3_keys[side], local_path)
+            print(f"✅ Downloaded {side} model from S3.")
+        else:
+            raise NoCredentialsError()
     except NoCredentialsError:
-        print("⚠️ No AWS credentials found. Falling back to public URL.")
-        urllib.request.urlretrieve(S3_URLS[side], local_path)
-        print(f"✅ Downloaded {side} model from public S3 URL.")
+        try:
+            print(f"🌐 Falling back to public URL for {side}...")
+            urllib.request.urlretrieve(S3_URLS[side], local_path)
+            print(f"✅ Downloaded {side} model from public S3 URL.")
+        except Exception as e:
+            print(f"❌ Public URL fallback failed for {side}: {e}")
+            traceback.print_exc()
+            raise
     except Exception as e:
-        print(f"❌ Failed to download {side} model: {e}")
+        print(f"❌ S3 download failed for {side}: {e}")
+        traceback.print_exc()
         raise
-
 
 def load_model(side):
     download_model_if_needed(side)
@@ -55,7 +69,6 @@ def load_model(side):
     model.load_state_dict(torch.load(model_paths[side], map_location='cpu'))
     model.eval()
     return model
-
 
 def predict_image(file, side):
     model = load_model(side)
