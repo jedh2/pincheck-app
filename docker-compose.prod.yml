@@ -3,31 +3,26 @@ services:
   app:
     build: .
     container_name: app
-    expose:
-      - "5000"
+    ports:
+      - "5000:5000"
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
     volumes:
       - .:/app
-    working_dir: /app
-    environment:
-      - PYTHONPATH=/app
-      - FLASK_ENV=production
-      - PORT=5000
-      - AWS_ACCESS_KEY_ID
-      - AWS_SECRET_ACCESS_KEY
-      - AWS_REGION
+    restart: always
 
   nginx:
     image: nginx:latest
     container_name: nginx
     ports:
       - "80:80"
-      - "443:443"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./certbot/www:/var/www/certbot
-      - ./certbot/conf:/etc/letsencrypt
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - app
+    restart: always
 
   # certbot:
   #   image: certbot/certbot

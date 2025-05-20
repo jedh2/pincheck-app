@@ -72,9 +72,12 @@ jobs:
             sudo AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID                  AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY                  AWS_REGION=$AWS_REGION                  docker-compose -f docker-compose.prod.yml up --build -d
 
             echo "🔍 Verifying AWS env in container..."
-            CONTAINER_ID=$(sudo docker ps -q --filter "name=flask")
+            CONTAINER_ID=$(sudo docker ps -q --filter "name=app")
             if [ -n "$CONTAINER_ID" ]; then
               sudo docker exec $CONTAINER_ID printenv | grep AWS
             else
-              echo "❌ No running container found for flask"
+              echo "❌ No running container found for app, flask"
+
+            echo "📦 Container logs for model download:"
+            sudo docker logs $CONTAINER_ID | tail -n 100
             fi
