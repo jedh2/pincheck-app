@@ -21,22 +21,29 @@ def predict():
 
         results = {}
         if front_file:
+            app.logger.info("📸 Received front image for prediction.")
             label, gradcam_url = predict_image(front_file, side="front")
             results['front_prediction'] = label
             results['front_gradcam'] = gradcam_url
+            app.logger.info(f"✅ Front prediction: {label}")
 
         if back_file:
+            app.logger.info("📸 Received back image for prediction.")
             label, gradcam_url = predict_image(back_file, side="back")
             results['back_prediction'] = label
             results['back_gradcam'] = gradcam_url
+            app.logger.info(f"✅ Back prediction: {label}")
+
+        if not results:
+            app.logger.warning("⚠️ No files uploaded in request.")
+            return jsonify({"error": "No files uploaded"}), 400
 
         return jsonify(results)
 
     except Exception as e:
-        import traceback
         app.logger.error("🔥 Exception in /predict route:")
         app.logger.error(traceback.format_exc())
-        return jsonify({"error": "Internal Server Error"}), 500
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000)
