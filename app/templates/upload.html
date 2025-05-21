@@ -86,6 +86,7 @@
     <button type="submit" id="submitBtn">Submit</button>
     <button type="button" id="clearBtn">Clear Photos</button>
     <div id="spinner">🔄 Processing...</div>
+<progress id="uploadProgress" max="100" value="0" style="width:80%; display:none;"></progress>
   </form>
 
   <div class="preview" id="results"></div>
@@ -97,6 +98,8 @@
     const backInput = document.getElementById('back-input');
     const form = document.getElementById('uploadForm');
     const results = document.getElementById('results');
+const previewContainer = document.createElement('div');
+results.parentNode.insertBefore(previewContainer, results);
     const submitBtn = document.getElementById('submitBtn');
     const clearBtn = document.getElementById('clearBtn');
     const spinner = document.getElementById('spinner');
@@ -134,9 +137,123 @@
     setupDropZone(dropZoneFront, frontInput);
     setupDropZone(dropZoneBack, backInput);
 
-    form.addEventListener('submit', async (e) => {
+    
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  results.innerHTML = '';
+  spinner.style.display = 'block';
+  submitBtn.style.display = 'none';
+
+  const formData = new FormData();
+  previewContainer.innerHTML = '';
+
+  
+    function showPreview(file, side) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.alt = side + " preview";
+        img.style.maxWidth = "200px";
+        img.style.margin = "10px";
+        previewContainer.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function compressImage(file) {
+
+    return new Promise((resolve) => {
+      const img = new Image();
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        img.src = event.target.result;
+      };
+
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxDim = 1600;
+        const scale = Math.min(maxDim / img.width, maxDim / img.height, 1);
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+          resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+        }, 'image/jpeg', 0.7);
+      };
+
+      reader.readAsDataURL(file);
+    });
+  }
+
+  if (frontInput.files.length > 0) {
+    const compressed = await compressImage(frontInput.files[0]);
+    formData.append('front', compressed);
+    showPreview(compressed, 'front');
+  }
+
+  if (backInput.files.length > 0) {
+    const compressed = await compressImage(backInput.files[0]);
+    formData.append('back', compressed);
+    showPreview(compressed, 'back');
+  }
+
+  if (!formData.has('front') && !formData.has('back')) {
+    results.innerHTML = '<p style="color:red;">❌ Please upload at least one image.</p>';
+    spinner.style.display = 'none';
+    submitBtn.style.display = 'inline';
+    return;
+  }
+
+  try {
+    
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", "/predict", true);
+          xhr.upload.onprogress = function(e) {
+            if (e.lengthComputable) {
+              const percent = (e.loaded / e.total) * 100;
+              document.getElementById('uploadProgress').value = percent;
+              document.getElementById('uploadProgress').style.display = 'block';
+            }
+          };
+
+          const response = await new Promise((resolve, reject) => {
+            xhr.onload = () => resolve(new Response(xhr.responseText, { status: xhr.status }));
+            xhr.onerror = () => reject(new Error("Network error"));
+            xhr.send(formData);
+          });
+
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) throw new Error("Server error");
+
+    const data = await response.json();
+
+    if (data.error) {
+      results.innerHTML = `<p style="color:red;">❌ ${data.error}</p>`;
+    } else {
+      if (data.front_prediction) {
+        results.innerHTML += `<p><strong>Front Prediction:</strong> ${data.front_prediction}</p><img src="${data.front_gradcam}?t=${Date.now()}" alt="Front Grad-CAM">`;
+      }
+      if (data.back_prediction) {
+        results.innerHTML += `<p><strong>Back Prediction:</strong> ${data.back_prediction}</p><img src="${data.back_gradcam}?t=${Date.now()}" alt="Back Grad-CAM">`;
+      }
+    }
+  } catch (err) {
+    results.innerHTML = `<p style="color:red;">❌ ${err.message}</p>`;
+  } finally {
+    spinner.style.display = 'none';
+    submitBtn.style.display = 'inline';
+  }
+
       e.preventDefault();
       const formData = new FormData();
+  previewContainer.innerHTML = '';
       results.innerHTML = '';
       spinner.style.display = 'block';
       submitBtn.style.display = 'none';
@@ -150,7 +267,23 @@
 
       if (formData.has('front') || formData.has('back')) {
         try {
-          const response = await fetch('/predict', {
+          
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", "/predict", true);
+          xhr.upload.onprogress = function(e) {
+            if (e.lengthComputable) {
+              const percent = (e.loaded / e.total) * 100;
+              document.getElementById('uploadProgress').value = percent;
+              document.getElementById('uploadProgress').style.display = 'block';
+            }
+          };
+
+          const response = await new Promise((resolve, reject) => {
+            xhr.onload = () => resolve(new Response(xhr.responseText, { status: xhr.status }));
+            xhr.onerror = () => reject(new Error("Network error"));
+            xhr.send(formData);
+          });
+
             method: 'POST',
             body: formData
           });
@@ -189,7 +322,92 @@
       dropZoneBack.querySelector('.file-label').textContent = 'Drag & Drop Back Image Here';
       results.innerHTML = '';
     });
-  </script>
+  
+async function submitSample(type) {
+  results.innerHTML = '';
+  spinner.style.display = 'block';
+  submitBtn.style.display = 'none';
+  document.getElementById('uploadProgress').style.display = 'none';
+
+  const formData = new FormData();
+  const urls = {
+    real: {
+      front: '/static/samples/real_front.jpg',
+      back: '/static/samples/real_back.jpg'
+    },
+    fake: {
+      front: '/static/samples/fake_front.jpg',
+      back: '/static/samples/fake_back.jpg'
+    }
+  };
+
+  async function fetchAndConvert(url, name) {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    return new File([blob], name, { type: blob.type });
+  }
+
+  try {
+    const frontFile = await fetchAndConvert(urls[type].front, `${type}_front.jpg`);
+    const backFile = await fetchAndConvert(urls[type].back, `${type}_back.jpg`);
+    formData.append('front', frontFile);
+    formData.append('back', backFile);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/predict", true);
+    xhr.upload.onprogress = function(e) {
+      if (e.lengthComputable) {
+        const percent = (e.loaded / e.total) * 100;
+        document.getElementById('uploadProgress').value = percent;
+        document.getElementById('uploadProgress').style.display = 'block';
+      }
+    };
+
+    const response = await new Promise((resolve, reject) => {
+      xhr.onload = () => resolve(new Response(xhr.responseText, { status: xhr.status }));
+      xhr.onerror = () => reject(new Error("Network error"));
+      xhr.send(formData);
+    });
+
+    const data = await response.json();
+    if (data.error) {
+      results.innerHTML = `<p style="color:red;">❌ ${data.error}</p>`;
+    } else {
+      if (data.front_prediction) {
+        results.innerHTML += `<p><strong>Front Prediction:</strong> ${data.front_prediction}</p><img src="${data.front_gradcam}?t=${Date.now()}" alt="Front Grad-CAM">`;
+      }
+      if (data.back_prediction) {
+        results.innerHTML += `<p><strong>Back Prediction:</strong> ${data.back_prediction}</p><img src="${data.back_gradcam}?t=${Date.now()}" alt="Back Grad-CAM">`;
+      }
+    }
+  } catch (err) {
+    results.innerHTML = `<p style="color:red;">❌ ${err.message}</p>`;
+  } finally {
+    spinner.style.display = 'none';
+    submitBtn.style.display = 'inline';
+  }
+}
+
+</script>
+
+
+  <hr style="margin-top: 3em; margin-bottom: 2em;">
+
+  <h2>Sample Pins</h2>
+  <div style="display: flex; justify-content: center; gap: 2em; flex-wrap: wrap;">
+    <div>
+      <h3>Sample: Real Pin</h3>
+      <img src="/static/samples/real_front.jpg" alt="Real Front" style="max-width: 150px;"><br>
+      <img src="/static/samples/real_back.jpg" alt="Real Back" style="max-width: 150px; margin-top: 0.5em;"><br>
+      <button onclick="submitSample('real')">Submit Sample</button>
+    </div>
+    <div>
+      <h3>Sample: Fake Pin</h3>
+      <img src="/static/samples/fake_front.jpg" alt="Fake Front" style="max-width: 150px;"><br>
+      <img src="/static/samples/fake_back.jpg" alt="Fake Back" style="max-width: 150px; margin-top: 0.5em;"><br>
+      <button onclick="submitSample('fake')">Submit Sample</button>
+    </div>
+  </div>
 
 </body>
 </html>
