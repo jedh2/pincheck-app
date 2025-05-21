@@ -2,7 +2,9 @@ import torch
 import cv2
 import numpy as np
 import os
+import glob
 from torchvision.models import resnet18
+import uuid
 
 STATIC_PATH = 'app/static/gradcam_results'
 
@@ -47,11 +49,27 @@ def generate_gradcam(model, input_tensor, side):
     input_image = np.uint8(255 * input_image)
 
     overlay = cv2.addWeighted(input_image, 0.5, cam, 0.5, 0)
-    filename = f'{side}_gradcam.jpg'
+
+    os.makedirs(STATIC_PATH, exist_ok=True)
+
+    unique_id = uuid.uuid4().hex
+    filename = f"{side}_gradcam_{unique_id}.jpg"
     filepath = os.path.join(STATIC_PATH, filename)
     cv2.imwrite(filepath, overlay[:, :, ::-1])
 
     handle1.remove()
     handle2.remove()
+
+    # Keep only the 3 most recent files
+    files = sorted(
+        glob.glob(os.path.join(STATIC_PATH, f"{side}_gradcam_*.jpg")),
+        key=os.path.getmtime,
+        reverse=True
+    )
+    for old_file in files[3:]:
+        try:
+            os.remove(old_file)
+        except:
+            pass
 
     return f"/static/gradcam_results/{filename}"

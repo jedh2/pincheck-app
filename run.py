@@ -4,6 +4,7 @@ from app.utils import setup_logging
 import os
 import traceback
 import sys
+import time
 
 app = Flask(__name__, static_folder='app/static', template_folder='app/templates')
 setup_logging()
@@ -24,14 +25,14 @@ def predict():
             app.logger.info("📸 Received front image for prediction.")
             label, gradcam_url = predict_image(front_file, side="front")
             results['front_prediction'] = label
-            results['front_gradcam'] = gradcam_url
+            results['front_gradcam'] = f"{gradcam_url}?t={int(time.time())}"
             app.logger.info(f"✅ Front prediction: {label}")
 
         if back_file:
             app.logger.info("📸 Received back image for prediction.")
             label, gradcam_url = predict_image(back_file, side="back")
             results['back_prediction'] = label
-            results['back_gradcam'] = gradcam_url
+            results['back_gradcam'] = f"{gradcam_url}?t={int(time.time())}"
             app.logger.info(f"✅ Back prediction: {label}")
 
         if not results:
