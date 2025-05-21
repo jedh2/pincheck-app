@@ -1,4 +1,6 @@
 # docker-compose.prod.yml for EC2 production with HTTPS
+version: '3.8'
+
 services:
   app:
     build: .
@@ -18,19 +20,10 @@ services:
     container_name: nginx
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./nginx:/etc/nginx/conf.d
+      - ./certbot/conf:/etc/letsencrypt
     depends_on:
       - app
     restart: always
-
-  # certbot:
-  #   image: certbot/certbot
-  #   container_name: certbot
-  #   volumes:
-  #     - ./certbot/www:/var/www/certbot
-  #     - ./certbot/conf:/etc/letsencrypt
-  #   entrypoint: >
-  #     sh -c "certbot certonly --webroot --webroot-path=/var/www/certbot \
-  #     --email your@email.com --agree-tos --no-eff-email \
-  #     -d yourdomain.com -d www.yourdomain.com"
