@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PinCheck Upload</title>
   <style>
     body {
@@ -11,11 +12,6 @@
       background-color: #f4f4f4;
       text-align: center;
     }
-
-    h1 {
-      margin-bottom: 1em;
-    }
-
     .drop-zone {
       border: 2px dashed #999;
       border-radius: 8px;
@@ -24,16 +20,13 @@
       background-color: #fff;
       cursor: pointer;
     }
-
     .drop-zone.dragover {
       background-color: #eef;
       border-color: #666;
     }
-
     .file-label {
       font-weight: bold;
     }
-
     button {
       padding: 0.8em 2em;
       background-color: #007BFF;
@@ -42,73 +35,69 @@
       border-radius: 4px;
       font-size: 1em;
       cursor: pointer;
-      margin: 0.5em;
     }
-
     button:hover {
       background-color: #0056b3;
     }
-
     .preview {
       margin-top: 2em;
     }
-
     .preview img {
       max-width: 90%;
       height: auto;
       margin-top: 1em;
       border-radius: 6px;
     }
-
     #spinner {
       display: none;
-      font-size: 1.2em;
-      color: #555;
-      margin-top: 1em;
+      margin: 1em auto;
+    }
+    #uploadProgress {
+      display: none;
+      width: 80%;
+      height: 1.5em;
+      margin: 1em auto;
     }
   </style>
 </head>
 <body>
-
   <h1>Upload Disney Pin (Front & Back)</h1>
 
   <form id="uploadForm" enctype="multipart/form-data">
     <div class="drop-zone" id="drop-zone-front">
-      <span class="file-label">Drag & Drop Front Image Here</span><br>
-      <input type="file" name="front" id="front-input" accept="image/*" hidden>
+      <span class="file-label">Drag & Drop Front Image Here</span><br />
+      <input type="file" name="front" id="front-input" accept="image/*" hidden />
     </div>
 
     <div class="drop-zone" id="drop-zone-back">
-      <span class="file-label">Drag & Drop Back Image Here</span><br>
-      <input type="file" name="back" id="back-input" accept="image/*" hidden>
+      <span class="file-label">Drag & Drop Back Image Here</span><br />
+      <input type="file" name="back" id="back-input" accept="image/*" hidden />
     </div>
 
     <button type="submit" id="submitBtn">Submit</button>
     <button type="button" id="clearBtn">Clear Photos</button>
-    <div id="spinner">🔄 Processing...</div>
-<progress id="uploadProgress" max="100" value="0" style="width:80%; display:none;"></progress>
+
+    <div id="spinner">🔄 Loading...</div>
+    <progress id="uploadProgress" value="0" max="100"></progress>
   </form>
 
   <div class="preview" id="results"></div>
 
-
-
-  <hr style="margin-top: 3em; margin-bottom: 2em;">
-
-  <h2>Sample Pins</h2>
-  <div style="display: flex; justify-content: center; gap: 2em; flex-wrap: wrap;">
-    <div>
-      <h3>Sample: Real Pin</h3>
-      <img src="/static/samples/real_front.jpg" alt="Real Front" style="max-width: 150px;"><br>
-      <img src="/static/samples/real_back.jpg" alt="Real Back" style="max-width: 150px; margin-top: 0.5em;"><br>
-      <button onclick="submitSample('real')">Submit Sample</button>
-    </div>
-    <div>
-      <h3>Sample: Fake Pin</h3>
-      <img src="/static/samples/fake_front.jpg" alt="Fake Front" style="max-width: 150px;"><br>
-      <img src="/static/samples/fake_back.jpg" alt="Fake Back" style="max-width: 150px; margin-top: 0.5em;"><br>
-      <button onclick="submitSample('fake')">Submit Sample</button>
-    </div>
+  <hr />
+  <h2>Try a Sample Pin</h2>
+  <div>
+    <h3>Sample: Real Pin</h3>
+    <img src="/static/samples/real_front.jpg" alt="Real Front" width="100" />
+    <img src="/static/samples/real_back.jpg" alt="Real Back" width="100" />
+    <br />
+    <button onclick="submitSample('real')">Submit Sample</button>
+  </div>
+  <div>
+    <h3>Sample: Fake Pin</h3>
+    <img src="/static/samples/fake_front.jpg" alt="Fake Front" width="100" />
+    <img src="/static/samples/fake_back.jpg" alt="Fake Back" width="100" />
+    <br />
+    <button onclick="submitSample('fake')">Submit Sample</button>
   </div>
 
   <script>
@@ -118,24 +107,17 @@
     const backInput = document.getElementById('back-input');
     const form = document.getElementById('uploadForm');
     const results = document.getElementById('results');
-const previewContainer = document.createElement('div');
-results.parentNode.insertBefore(previewContainer, results);
+    const spinner = document.getElementById('spinner');
     const submitBtn = document.getElementById('submitBtn');
     const clearBtn = document.getElementById('clearBtn');
-    const spinner = document.getElementById('spinner');
 
     function setupDropZone(dropZone, fileInput) {
       dropZone.addEventListener('click', () => fileInput.click());
-
       dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
         dropZone.classList.add('dragover');
       });
-
-      dropZone.addEventListener('dragleave', () => {
-        dropZone.classList.remove('dragover');
-      });
-
+      dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
       dropZone.addEventListener('drop', (e) => {
         e.preventDefault();
         dropZone.classList.remove('dragover');
@@ -145,7 +127,6 @@ results.parentNode.insertBefore(previewContainer, results);
           dropZone.querySelector('.file-label').textContent = `Selected: ${file.name}`;
         }
       });
-
       fileInput.addEventListener('change', () => {
         const file = fileInput.files[0];
         if (file) {
@@ -157,263 +138,118 @@ results.parentNode.insertBefore(previewContainer, results);
     setupDropZone(dropZoneFront, frontInput);
     setupDropZone(dropZoneBack, backInput);
 
-    
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  results.innerHTML = '';
-  spinner.style.display = 'block';
-  submitBtn.style.display = 'none';
-
-  const formData = new FormData();
-  previewContainer.innerHTML = '';
-
-  
-    function showPreview(file, side) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const img = document.createElement('img');
-        img.src = e.target.result;
-        img.alt = side + " preview";
-        img.style.maxWidth = "200px";
-        img.style.margin = "10px";
-        previewContainer.appendChild(img);
-      };
-      reader.readAsDataURL(file);
-    }
-
-    async function compressImage(file) {
-
-    return new Promise((resolve) => {
-      const img = new Image();
-      const reader = new FileReader();
-
-      reader.onload = (event) => {
-        img.src = event.target.result;
-      };
-
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const maxDim = 1600;
-        const scale = Math.min(maxDim / img.width, maxDim / img.height, 1);
-        canvas.width = img.width * scale;
-        canvas.height = img.height * scale;
-
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        canvas.toBlob((blob) => {
-          resolve(new File([blob], file.name, { type: 'image/jpeg' }));
-        }, 'image/jpeg', 0.7);
-      };
-
-      reader.readAsDataURL(file);
-    });
-  }
-
-  if (frontInput.files.length > 0) {
-    const compressed = await compressImage(frontInput.files[0]);
-    formData.append('front', compressed);
-    showPreview(compressed, 'front');
-  }
-
-  if (backInput.files.length > 0) {
-    const compressed = await compressImage(backInput.files[0]);
-    formData.append('back', compressed);
-    showPreview(compressed, 'back');
-  }
-
-  if (!formData.has('front') && !formData.has('back')) {
-    results.innerHTML = '<p style="color:red;">❌ Please upload at least one image.</p>';
-    spinner.style.display = 'none';
-    submitBtn.style.display = 'inline';
-    return;
-  }
-
-  try {
-    
-          const xhr = new XMLHttpRequest();
-          xhr.open("POST", "/predict", true);
-          xhr.upload.onprogress = function(e) {
-            if (e.lengthComputable) {
-              const percent = (e.loaded / e.total) * 100;
-              document.getElementById('uploadProgress').value = percent;
-              document.getElementById('uploadProgress').style.display = 'block';
-            }
-          };
-
-          const response = await new Promise((resolve, reject) => {
-            xhr.onload = () => resolve(new Response(xhr.responseText, { status: xhr.status }));
-            xhr.onerror = () => reject(new Error("Network error"));
-            xhr.send(formData);
-          });
-
-      method: 'POST',
-        const response = await fetch('/predict', {
-          method: 'POST',
-          body: formData
-        });
-    });
-
-    if (!response.ok) throw new Error("Server error");
-
-    const data = await response.json();
-
-    if (data.error) {
-      results.innerHTML = `<p style="color:red;">❌ ${data.error}</p>`;
-    } else {
-      if (data.front_prediction) {
-        results.innerHTML += `<p><strong>Front Prediction:</strong> ${data.front_prediction}</p><img src="${data.front_gradcam}?t=${Date.now()}" alt="Front Grad-CAM">`;
-      }
-      if (data.back_prediction) {
-        results.innerHTML += `<p><strong>Back Prediction:</strong> ${data.back_prediction}</p><img src="${data.back_gradcam}?t=${Date.now()}" alt="Back Grad-CAM">`;
-      }
-    }
-  } catch (err) {
-    results.innerHTML = `<p style="color:red;">❌ ${err.message}</p>`;
-  } finally {
-    spinner.style.display = 'none';
-    submitBtn.style.display = 'inline';
-  }
-
-      e.preventDefault();
-      const formData = new FormData();
-  previewContainer.innerHTML = '';
-      results.innerHTML = '';
-      spinner.style.display = 'block';
-      submitBtn.style.display = 'none';
-
-      if (frontInput.files.length > 0) {
-        formData.append('front', frontInput.files[0]);
-      }
-      if (backInput.files.length > 0) {
-        formData.append('back', backInput.files[0]);
-      }
-
-      if (formData.has('front') || formData.has('back')) {
-        try {
-          
-          const xhr = new XMLHttpRequest();
-          xhr.open("POST", "/predict", true);
-          xhr.upload.onprogress = function(e) {
-            if (e.lengthComputable) {
-              const percent = (e.loaded / e.total) * 100;
-              document.getElementById('uploadProgress').value = percent;
-              document.getElementById('uploadProgress').style.display = 'block';
-            }
-          };
-
-          const response = await new Promise((resolve, reject) => {
-            xhr.onload = () => resolve(new Response(xhr.responseText, { status: xhr.status }));
-            xhr.onerror = () => reject(new Error("Network error"));
-            xhr.send(formData);
-          });
-
-            method: 'POST',
-        const response = await fetch('/predict', {
-          method: 'POST',
-          body: formData
-        });
-          });
-
-          if (!response.ok) throw new Error("Server error");
-
-          const data = await response.json();
-
-          if (data.error) {
-            results.innerHTML = `<p style="color:red;">❌ ${data.error}</p>`;
-          } else {
-            if (data.front_prediction) {
-              results.innerHTML += `<p><strong>Front Prediction:</strong> ${data.front_prediction}</p><img src="${data.front_gradcam}?t=${Date.now()}" alt="Front Grad-CAM">`;
-            }
-            if (data.back_prediction) {
-              results.innerHTML += `<p><strong>Back Prediction:</strong> ${data.back_prediction}</p><img src="${data.back_gradcam}?t=${Date.now()}" alt="Back Grad-CAM">`;
-            }
-          }
-        } catch (err) {
-          results.innerHTML = `<p style="color:red;">❌ ${err.message}</p>`;
-        } finally {
-          spinner.style.display = 'none';
-          submitBtn.style.display = 'inline';
-        }
-      } else {
-        results.innerHTML = '<p style="color:red;">❌ Please upload at least one image.</p>';
-        spinner.style.display = 'none';
-        submitBtn.style.display = 'inline';
-      }
-    });
-
     clearBtn.addEventListener('click', () => {
       frontInput.value = '';
       backInput.value = '';
       dropZoneFront.querySelector('.file-label').textContent = 'Drag & Drop Front Image Here';
       dropZoneBack.querySelector('.file-label').textContent = 'Drag & Drop Back Image Here';
-      results.innerHTML = '';
     });
-  
-window.submitSample = async function(type) {
-  results.innerHTML = '';
-  spinner.style.display = 'block';
-  submitBtn.style.display = 'none';
-  document.getElementById('uploadProgress').style.display = 'none';
 
-  const formData = new FormData();
-  const urls = {
-    real: {
-      front: '/static/samples/real_front.jpg',
-      back: '/static/samples/real_back.jpg'
-    },
-    fake: {
-      front: '/static/samples/fake_front.jpg',
-      back: '/static/samples/fake_back.jpg'
-    }
-  };
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData();
+      if (frontInput.files.length > 0) formData.append('front', frontInput.files[0]);
+      if (backInput.files.length > 0) formData.append('back', backInput.files[0]);
 
-  async function fetchAndConvert(url, name) {
-    const res = await fetch(url);
-    const blob = await res.blob();
-    return new File([blob], name, { type: blob.type });
-  }
+      spinner.style.display = 'block';
+      submitBtn.style.display = 'none';
+      results.innerHTML = '';
+      document.getElementById('uploadProgress').value = 0;
+      document.getElementById('uploadProgress').style.display = 'block';
 
-  try {
-    const frontFile = await fetchAndConvert(urls[type].front, `${type}_front.jpg`);
-    const backFile = await fetchAndConvert(urls[type].back, `${type}_back.jpg`);
-    formData.append('front', frontFile);
-    formData.append('back', backFile);
-
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "/predict", true);
-    xhr.upload.onprogress = function(e) {
-      if (e.lengthComputable) {
-        const percent = (e.loaded / e.total) * 100;
-        document.getElementById('uploadProgress').value = percent;
-        document.getElementById('uploadProgress').style.display = 'block';
-      }
-    };
-
-    const response = await new Promise((resolve, reject) => {
-      xhr.onload = () => resolve(new Response(xhr.responseText, { status: xhr.status }));
-      xhr.onerror = () => reject(new Error("Network error"));
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "/predict", true);
+      xhr.upload.onprogress = function (e) {
+        if (e.lengthComputable) {
+          document.getElementById('uploadProgress').value = (e.loaded / e.total) * 100;
+        }
+      };
+      xhr.onload = () => {
+        spinner.style.display = 'none';
+        submitBtn.style.display = 'inline';
+        document.getElementById('uploadProgress').style.display = 'none';
+        const data = JSON.parse(xhr.responseText);
+        if (data.error) {
+          results.innerHTML = `<p style="color:red;">❌ ${data.error}</p>`;
+        } else {
+          if (data.front_prediction)
+            results.innerHTML += `<p><strong>Front Prediction:</strong> ${data.front_prediction}</p><img src="${data.front_gradcam}?t=${Date.now()}" alt="Front Grad-CAM" />`;
+          if (data.back_prediction)
+            results.innerHTML += `<p><strong>Back Prediction:</strong> ${data.back_prediction}</p><img src="${data.back_gradcam}?t=${Date.now()}" alt="Back Grad-CAM" />`;
+        }
+      };
+      xhr.onerror = () => {
+        results.innerHTML = `<p style="color:red;">❌ Network Error</p>`;
+        spinner.style.display = 'none';
+        submitBtn.style.display = 'inline';
+      };
       xhr.send(formData);
     });
 
-    const data = await response.json();
-    if (data.error) {
-      results.innerHTML = `<p style="color:red;">❌ ${data.error}</p>`;
-    } else {
-      if (data.front_prediction) {
-        results.innerHTML += `<p><strong>Front Prediction:</strong> ${data.front_prediction}</p><img src="${data.front_gradcam}?t=${Date.now()}" alt="Front Grad-CAM">`;
-      }
-      if (data.back_prediction) {
-        results.innerHTML += `<p><strong>Back Prediction:</strong> ${data.back_prediction}</p><img src="${data.back_gradcam}?t=${Date.now()}" alt="Back Grad-CAM">`;
-      }
-    }
-  } catch (err) {
-    results.innerHTML = `<p style="color:red;">❌ ${err.message}</p>`;
-  } finally {
-    spinner.style.display = 'none';
-    submitBtn.style.display = 'inline';
-  }
-}
+    window.submitSample = async function(type) {
+      const urls = {
+        real: {
+          front: '/static/samples/real_front.jpg',
+          back: '/static/samples/real_back.jpg'
+        },
+        fake: {
+          front: '/static/samples/fake_front.jpg',
+          back: '/static/samples/fake_back.jpg'
+        }
+      };
 
-</script>
+      const formData = new FormData();
+      async function fetchAndConvert(url, name) {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        return new File([blob], name, { type: blob.type });
+      }
+
+      spinner.style.display = 'block';
+      submitBtn.style.display = 'none';
+      results.innerHTML = '';
+      document.getElementById('uploadProgress').value = 0;
+      document.getElementById('uploadProgress').style.display = 'block';
+
+      try {
+        const frontFile = await fetchAndConvert(urls[type].front, `${type}_front.jpg`);
+        const backFile = await fetchAndConvert(urls[type].back, `${type}_back.jpg`);
+        formData.append('front', frontFile);
+        formData.append('back', backFile);
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/predict", true);
+        xhr.upload.onprogress = function (e) {
+          if (e.lengthComputable) {
+            document.getElementById('uploadProgress').value = (e.loaded / e.total) * 100;
+          }
+        };
+        xhr.onload = () => {
+          spinner.style.display = 'none';
+          submitBtn.style.display = 'inline';
+          document.getElementById('uploadProgress').style.display = 'none';
+          const data = JSON.parse(xhr.responseText);
+          if (data.error) {
+            results.innerHTML = `<p style="color:red;">❌ ${data.error}</p>`;
+          } else {
+            if (data.front_prediction)
+              results.innerHTML += `<p><strong>Front Prediction:</strong> ${data.front_prediction}</p><img src="${data.front_gradcam}?t=${Date.now()}" alt="Front Grad-CAM" />`;
+            if (data.back_prediction)
+              results.innerHTML += `<p><strong>Back Prediction:</strong> ${data.back_prediction}</p><img src="${data.back_gradcam}?t=${Date.now()}" alt="Back Grad-CAM" />`;
+          }
+        };
+        xhr.onerror = () => {
+          results.innerHTML = `<p style="color:red;">❌ Network Error</p>`;
+          spinner.style.display = 'none';
+          submitBtn.style.display = 'inline';
+        };
+        xhr.send(formData);
+      } catch (err) {
+        results.innerHTML = `<p style="color:red;">❌ ${err.message}</p>`;
+        spinner.style.display = 'none';
+        submitBtn.style.display = 'inline';
+      }
+    };
+  </script>
 </body>
 </html>
