@@ -5,6 +5,8 @@ import os
 import glob
 from torchvision.models import resnet18
 import uuid
+import gc
+from torchvision import transforms
 
 STATIC_PATH = 'app/static/gradcam_results'
 
@@ -22,13 +24,18 @@ def generate_gradcam(model, input_tensor, side):
     handle1 = target_layer.register_forward_hook(save_activations_hook)
     handle2 = target_layer.register_backward_hook(save_gradients_hook)
 
-    output = model(input_tensor)
+    # Resize a clone of the input tensor to 224x224 just for GradCAM
+    transform_resize = transforms.Resize((224, 224))
+    downscaled_tensor = transform_resize(input_tensor.squeeze()).unsqueeze(0)
+
+    # Forward + backward on downscaled copy
+    output = model(downscaled_tensor)
     pred_class = output.argmax().item()
     model.zero_grad()
     output[0, pred_class].backward()
 
-    grads_val = gradients[0].detach().numpy()[0]
-    acts_val = activations[0].detach().numpy()[0]
+    grads_val = gradients[0].detach().cpu().numpy()[0]
+    acts_val = activations[0].detach().cpu().numpy()[0]
 
     weights = np.mean(grads_val, axis=(1, 2))
     cam = np.zeros(acts_val.shape[1:], dtype=np.float32)
@@ -43,7 +50,8 @@ def generate_gradcam(model, input_tensor, side):
     cam = np.uint8(255 * cam)
     cam = cv2.applyColorMap(cam, cv2.COLORMAP_JET)
 
-    input_image = input_tensor.squeeze().permute(1, 2, 0).detach().numpy()
+    # Convert original input_tensor for overlay (resize to 224x224 for match)
+    input_image = transform_resize(input_tensor.squeeze()).permute(1, 2, 0).detach().cpu().numpy()
     input_image = np.clip((input_image * [0.229, 0.224, 0.225]) +
                           [0.485, 0.456, 0.406], 0, 1)
     input_image = np.uint8(255 * input_image)
@@ -51,7 +59,6 @@ def generate_gradcam(model, input_tensor, side):
     overlay = cv2.addWeighted(input_image, 0.5, cam, 0.5, 0)
 
     os.makedirs(STATIC_PATH, exist_ok=True)
-
     unique_id = uuid.uuid4().hex
     filename = f"{side}_gradcam_{unique_id}.jpg"
     filepath = os.path.join(STATIC_PATH, filename)
@@ -71,5 +78,16 @@ def generate_gradcam(model, input_tensor, side):
             os.remove(old_file)
         except:
             pass
+
+    # Cleanup
+    del gradients[:]
+    del activations[:]
+    del grads_val
+    del acts_val
+    del output
+    del downscaled_tensor
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
 
     return f"/static/gradcam_results/{filename}"
