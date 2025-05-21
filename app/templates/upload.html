@@ -42,6 +42,7 @@
       border-radius: 4px;
       font-size: 1em;
       cursor: pointer;
+      margin: 0.5em;
     }
 
     button:hover {
@@ -57,6 +58,13 @@
       height: auto;
       margin-top: 1em;
       border-radius: 6px;
+    }
+
+    #spinner {
+      display: none;
+      font-size: 1.2em;
+      color: #555;
+      margin-top: 1em;
     }
   </style>
 </head>
@@ -75,7 +83,9 @@
       <input type="file" name="back" id="back-input" accept="image/*" hidden>
     </div>
 
-    <button type="submit">Submit</button>
+    <button type="submit" id="submitBtn">Submit</button>
+    <button type="button" id="clearBtn">Clear Photos</button>
+    <div id="spinner">🔄 Processing...</div>
   </form>
 
   <div class="preview" id="results"></div>
@@ -87,6 +97,9 @@
     const backInput = document.getElementById('back-input');
     const form = document.getElementById('uploadForm');
     const results = document.getElementById('results');
+    const submitBtn = document.getElementById('submitBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const spinner = document.getElementById('spinner');
 
     function setupDropZone(dropZone, fileInput) {
       dropZone.addEventListener('click', () => fileInput.click());
@@ -124,6 +137,10 @@
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const formData = new FormData();
+      results.innerHTML = '';
+      spinner.style.display = 'block';
+      submitBtn.style.display = 'none';
+
       if (frontInput.files.length > 0) {
         formData.append('front', frontInput.files[0]);
       }
@@ -131,17 +148,46 @@
         formData.append('back', backInput.files[0]);
       }
 
-      const response = await fetch('/predict', {
-        method: 'POST',
-        body: formData
-      });
+      if (formData.has('front') || formData.has('back')) {
+        try {
+          const response = await fetch('/predict', {
+            method: 'POST',
+            body: formData
+          });
 
-      const data = await response.json();
-      results.innerHTML = `
-        ${data.front_prediction ? `<p><strong>Front Prediction:</strong> ${data.front_prediction}</p><img src="${data.front_gradcam}" alt="Front Grad-CAM">` : ''}
-        ${data.back_prediction ? `<p><strong>Back Prediction:</strong> ${data.back_prediction}</p><img src="${data.back_gradcam}" alt="Back Grad-CAM">` : ''}
-        ${data.error ? `<p style="color:red;">${data.error}</p>` : ''}
-      `;
+          if (!response.ok) throw new Error("Server error");
+
+          const data = await response.json();
+
+          if (data.error) {
+            results.innerHTML = `<p style="color:red;">❌ ${data.error}</p>`;
+          } else {
+            if (data.front_prediction) {
+              results.innerHTML += `<p><strong>Front Prediction:</strong> ${data.front_prediction}</p><img src="${data.front_gradcam}?t=${Date.now()}" alt="Front Grad-CAM">`;
+            }
+            if (data.back_prediction) {
+              results.innerHTML += `<p><strong>Back Prediction:</strong> ${data.back_prediction}</p><img src="${data.back_gradcam}?t=${Date.now()}" alt="Back Grad-CAM">`;
+            }
+          }
+        } catch (err) {
+          results.innerHTML = `<p style="color:red;">❌ ${err.message}</p>`;
+        } finally {
+          spinner.style.display = 'none';
+          submitBtn.style.display = 'inline';
+        }
+      } else {
+        results.innerHTML = '<p style="color:red;">❌ Please upload at least one image.</p>';
+        spinner.style.display = 'none';
+        submitBtn.style.display = 'inline';
+      }
+    });
+
+    clearBtn.addEventListener('click', () => {
+      frontInput.value = '';
+      backInput.value = '';
+      dropZoneFront.querySelector('.file-label').textContent = 'Drag & Drop Front Image Here';
+      dropZoneBack.querySelector('.file-label').textContent = 'Drag & Drop Back Image Here';
+      results.innerHTML = '';
     });
   </script>
 
