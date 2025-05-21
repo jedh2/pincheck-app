@@ -91,6 +91,26 @@
 
   <div class="preview" id="results"></div>
 
+
+
+  <hr style="margin-top: 3em; margin-bottom: 2em;">
+
+  <h2>Sample Pins</h2>
+  <div style="display: flex; justify-content: center; gap: 2em; flex-wrap: wrap;">
+    <div>
+      <h3>Sample: Real Pin</h3>
+      <img src="/static/samples/real_front.jpg" alt="Real Front" style="max-width: 150px;"><br>
+      <img src="/static/samples/real_back.jpg" alt="Real Back" style="max-width: 150px; margin-top: 0.5em;"><br>
+      <button onclick="submitSample('real')">Submit Sample</button>
+    </div>
+    <div>
+      <h3>Sample: Fake Pin</h3>
+      <img src="/static/samples/fake_front.jpg" alt="Fake Front" style="max-width: 150px;"><br>
+      <img src="/static/samples/fake_back.jpg" alt="Fake Back" style="max-width: 150px; margin-top: 0.5em;"><br>
+      <button onclick="submitSample('fake')">Submit Sample</button>
+    </div>
+  </div>
+
   <script>
     const dropZoneFront = document.getElementById('drop-zone-front');
     const frontInput = document.getElementById('front-input');
@@ -227,7 +247,10 @@ form.addEventListener('submit', async (e) => {
           });
 
       method: 'POST',
-      body: formData
+        const response = await fetch('/predict', {
+          method: 'POST',
+          body: formData
+        });
     });
 
     if (!response.ok) throw new Error("Server error");
@@ -285,7 +308,10 @@ form.addEventListener('submit', async (e) => {
           });
 
             method: 'POST',
-            body: formData
+        const response = await fetch('/predict', {
+          method: 'POST',
+          body: formData
+        });
           });
 
           if (!response.ok) throw new Error("Server error");
@@ -389,25 +415,5 @@ window.submitSample = async function(type) {
 }
 
 </script>
-
-
-  <hr style="margin-top: 3em; margin-bottom: 2em;">
-
-  <h2>Sample Pins</h2>
-  <div style="display: flex; justify-content: center; gap: 2em; flex-wrap: wrap;">
-    <div>
-      <h3>Sample: Real Pin</h3>
-      <img src="/static/samples/real_front.jpg" alt="Real Front" style="max-width: 150px;"><br>
-      <img src="/static/samples/real_back.jpg" alt="Real Back" style="max-width: 150px; margin-top: 0.5em;"><br>
-      <button onclick="submitSample('real')">Submit Sample</button>
-    </div>
-    <div>
-      <h3>Sample: Fake Pin</h3>
-      <img src="/static/samples/fake_front.jpg" alt="Fake Front" style="max-width: 150px;"><br>
-      <img src="/static/samples/fake_back.jpg" alt="Fake Back" style="max-width: 150px; margin-top: 0.5em;"><br>
-      <button onclick="submitSample('fake')">Submit Sample</button>
-    </div>
-  </div>
-
 </body>
 </html>
