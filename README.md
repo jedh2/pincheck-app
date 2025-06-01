@@ -22,7 +22,8 @@ bash init_ec2.sh
 ```
 
 ## S3 Setup
-- Upload `model_front.pth` and `model_back.pth` to S3
+- Upload `model_front.pth` and `model_back.pth` to S3. Unfortunately, the models are currently kept private in S3.
+- The model training scripts are located in app/model/
 - Set credentials in EC2 or GitHub secrets
 
 ## GitHub Secrets Required
@@ -32,7 +33,3 @@ bash init_ec2.sh
 - `AWS_ACCESS_KEY_ID`
 - `AWS_SECRET_ACCESS_KEY`
 - `AWS_REGION`
-
----
-
-Contributions welcome!

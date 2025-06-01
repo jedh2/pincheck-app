@@ -9,10 +9,10 @@ sudo systemctl start docker
 sudo systemctl enable docker
 sudo usermod -aG docker $USER
 
-# Clone the repository (replace with your repo URL)
+# Clone the repository
 cd ~
-git clone https://github.com/YOUR_USERNAME/pincheck.git
-cd pincheck
+git clone https://github.com/jedh2/pincheck-app.git
+cd pincheck-app
 
 # Install AWS CLI v2
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"

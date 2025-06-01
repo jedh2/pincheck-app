@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PinCheck Upload</title>
+  <title>Disney Pin Check</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -61,16 +61,20 @@
   </style>
 </head>
 <body>
-  <h1>Upload Disney Pin (Front & Back)</h1>
+  <h1>Disney Pin Check</h1>
+  <h2>Check if the pin is real or fake.</h2>
+  <p>To maximize the prediction accuracy:</p>
+  <p>1. Use the macro setting on your smart phone.</p>
+  <p>2. Place the pin on a uniform textured surface that is not the same color as the pin.</p>
 
   <form id="uploadForm" enctype="multipart/form-data">
     <div class="drop-zone" id="drop-zone-front">
-      <span class="file-label">Drag & Drop Front Image Here</span><br />
+      <span class="file-label">Upload Front Image Here</span><br />
       <input type="file" name="front" id="front-input" accept="image/*" hidden />
     </div>
 
     <div class="drop-zone" id="drop-zone-back">
-      <span class="file-label">Drag & Drop Back Image Here</span><br />
+      <span class="file-label">Upload Back Image Here</span><br />
       <input type="file" name="back" id="back-input" accept="image/*" hidden />
     </div>
 
